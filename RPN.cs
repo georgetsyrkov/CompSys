@@ -11,7 +11,7 @@ namespace CompSys
         public ReversePolishNotation(bool debug)
         {
             this._debug = debug;
-            this._opers = new List<string>(new string[] { "+", "-", "*", "/", "^", "(", ")", "ATAN", "SQRT", "SIN", "COS" });
+            this._opers = new List<string>(new string[] { "+", "-", "*", "/", "^", "(", ")", "ATAN", "SQRT", "SIN", "COS", "ASIN", "SIN2" });
         }
 
         private int GetPriority(string c)
@@ -22,7 +22,7 @@ namespace CompSys
             if (c == "+" || c == "-") { ret = 1; }
             if (c == "*" || c == "/") { ret = 2; }
             if (c == "^") { ret = 3; }
-            if (c == "LOG" || c == "SQRT" || c == "SIN"  || c == "COS"  || c == "TAN") { ret = 3; }
+            if (c == "LOG" || c == "SQRT" || c == "SIN"  || c == "COS"  || c == "TAN" || c == "SIN2") { ret = 3; }
             if (c == "EXP" || c == "ABS"  || c == "ASIN" || c == "ACOS" || c == "ATAN") { ret = 3; }
 
             return ret;
@@ -243,6 +243,10 @@ namespace CompSys
                             if (str == "SIN")
                             {
                                 summ = Convert.ToDecimal(Math.Sin(Convert.ToDouble(a)));
+                            }
+                            if (str == "SIN2")
+                            {
+                                summ = Convert.ToDecimal(Math.Sin((Convert.ToDouble(a)/ 180D) * Math.PI));
                             }
                             if (str == "ACOS")
                             {
