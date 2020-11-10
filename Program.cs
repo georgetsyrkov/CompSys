@@ -1,5 +1,7 @@
 ﻿using System;
 using University;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace CompSys
 {
@@ -87,10 +89,123 @@ namespace CompSys
                 Console.WriteLine($"Результат: {outputData}");
             }
 
+            else if (mode == "laba4")
+            {
+                DateTime file_start_time = DateTime.Now;
+                DateTime file_end_time = file_start_time;
+
+                string[] input_lines = System.IO.File.ReadAllLines("input.txt");
+
+                file_end_time = DateTime.Now;
+
+                TimeSpan file_delta = file_end_time - file_start_time;
+                Console.WriteLine($"Время чтения данных: {file_delta}");
+
+
+
+                DateTime array_start_time = DateTime.Now;
+                DateTime array_end_time = array_start_time;
+
+                int all_lines_count = input_lines.Length;
+                int small_lines_count = all_lines_count / 8;
+                
+                List<string> input_lines1 = new List<string>();
+                List<string> input_lines2 = new List<string>();
+                List<string> input_lines3 = new List<string>();
+                List<string> input_lines4 = new List<string>();
+                List<string> input_lines5 = new List<string>();
+                List<string> input_lines6 = new List<string>();
+                List<string> input_lines7 = new List<string>();
+                List<string> input_lines8 = new List<string>();
+
+                int arrayNum = 1;
+                int local_count = 0;
+
+                foreach(string str in input_lines)
+                {
+                    if (local_count < small_lines_count)
+                    {
+                        if (arrayNum == 1) { input_lines1.Add(str); }
+                        if (arrayNum == 2) { input_lines2.Add(str); }
+                        if (arrayNum == 3) { input_lines3.Add(str); }
+                        if (arrayNum == 4) { input_lines4.Add(str); }
+                        if (arrayNum == 5) { input_lines5.Add(str); }
+                        if (arrayNum == 6) { input_lines6.Add(str); }
+                        if (arrayNum == 7) { input_lines7.Add(str); }
+                        if (arrayNum == 8) { input_lines8.Add(str); }
+
+                        local_count++;
+                    }
+                    else
+                    {
+                        local_count = 0;
+                        arrayNum = arrayNum + 1;
+                    }
+                }
+
+                array_end_time = DateTime.Now;
+                TimeSpan array_delta = array_end_time - array_start_time;
+                Console.WriteLine($"Время реорганизации данных: {array_delta}");
+
+                Thread thread1 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread1.Start(input_lines1);
+                
+                Thread thread2 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread2.Start(input_lines2);
+
+                Thread thread3 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread3.Start(input_lines3);
+
+                Thread thread4 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread4.Start(input_lines4);
+
+                Thread thread5 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread5.Start(input_lines5);
+
+                Thread thread6 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread6.Start(input_lines6);
+
+                Thread thread7 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread7.Start(input_lines7);
+
+                Thread thread8 = new Thread(new ParameterizedThreadStart(CountArray));
+                thread8.Start(input_lines8);
+                
+                               
+
+                
+
+                //Console.WriteLine($"Время расчета: {delta}");                    
+            }
+
             else
             {
                 Console.WriteLine("Не правильно, попробуй еще раз");
             }
+
+
+            Console.WriteLine("Конец программы");
+        }
+
+
+        static void CountArray(object input_object)// input_lines)
+        {
+            List<string> input_lines = (List<string>)input_object;
+
+            ReversePolishNotation rpn = new ReversePolishNotation(false);
+
+            DateTime start_time = DateTime.Now;
+            DateTime end_time = start_time;
+
+            for (int i = 0; i < input_lines.Count; i++)
+            {
+                decimal result = rpn.GetResult(input_lines[i], new System.Collections.Generic.Dictionary<string, string>());
+            }
+
+            end_time = DateTime.Now;
+
+            TimeSpan delta = end_time - start_time;
+            Console.WriteLine($"Время расчета: {delta}");            
         }
 
         static void PrintSkillsData(Student s)
