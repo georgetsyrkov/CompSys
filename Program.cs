@@ -106,34 +106,25 @@ namespace CompSys
                 DateTime array_start_time = DateTime.Now;
                 DateTime array_end_time = array_start_time;
 
+                int all_threads = 8;
                 int all_lines_count = input_lines.Length;
-                int small_lines_count = all_lines_count / 8;
+                int small_lines_count = all_lines_count / all_threads;
                 
-                List<string> input_lines1 = new List<string>();
-                List<string> input_lines2 = new List<string>();
-                List<string> input_lines3 = new List<string>();
-                List<string> input_lines4 = new List<string>();
-                List<string> input_lines5 = new List<string>();
-                List<string> input_lines6 = new List<string>();
-                List<string> input_lines7 = new List<string>();
-                List<string> input_lines8 = new List<string>();
+                List<string>[] input_array = new List<string>[all_threads];
 
-                int arrayNum = 1;
+                for (int i = 0; i < all_threads; i++)
+                {
+                    input_array[i] = new List<string>();
+                }
+
+                int arrayNum = 0;
                 int local_count = 0;
 
                 foreach(string str in input_lines)
                 {
                     if (local_count < small_lines_count)
                     {
-                        if (arrayNum == 1) { input_lines1.Add(str); }
-                        if (arrayNum == 2) { input_lines2.Add(str); }
-                        if (arrayNum == 3) { input_lines3.Add(str); }
-                        if (arrayNum == 4) { input_lines4.Add(str); }
-                        if (arrayNum == 5) { input_lines5.Add(str); }
-                        if (arrayNum == 6) { input_lines6.Add(str); }
-                        if (arrayNum == 7) { input_lines7.Add(str); }
-                        if (arrayNum == 8) { input_lines8.Add(str); }
-
+                        input_array[arrayNum].Add(str);
                         local_count++;
                     }
                     else
@@ -147,65 +138,43 @@ namespace CompSys
                 TimeSpan array_delta = array_end_time - array_start_time;
                 Console.WriteLine($"Время реорганизации данных: {array_delta}");
 
-                Thread thread1 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread1.Start(input_lines1);
-                
-                Thread thread2 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread2.Start(input_lines2);
 
-                Thread thread3 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread3.Start(input_lines3);
+                for (int i = 0; i < all_threads; i++)
+                {
+                    Thread thread = new Thread(new ParameterizedThreadStart(CountArray));
+                    inputData data = new inputData();
+                    data.inputLines = input_array[i];
+                    data.threadNumber = i;
 
-                Thread thread4 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread4.Start(input_lines4);
-
-                Thread thread5 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread5.Start(input_lines5);
-
-                Thread thread6 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread6.Start(input_lines6);
-
-                Thread thread7 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread7.Start(input_lines7);
-
-                Thread thread8 = new Thread(new ParameterizedThreadStart(CountArray));
-                thread8.Start(input_lines8);
-                
-                               
-
-                
-
-                //Console.WriteLine($"Время расчета: {delta}");                    
+                    thread.Start(data);
+                }
             }
-
             else
             {
                 Console.WriteLine("Не правильно, попробуй еще раз");
             }
-
-
             Console.WriteLine("Конец программы");
         }
 
 
         static void CountArray(object input_object)// input_lines)
         {
-            List<string> input_lines = (List<string>)input_object;
+            inputData input_data = (inputData)input_object;
 
             ReversePolishNotation rpn = new ReversePolishNotation(false);
 
             DateTime start_time = DateTime.Now;
             DateTime end_time = start_time;
 
-            for (int i = 0; i < input_lines.Count; i++)
+            for (int i = 0; i < input_data.inputLines.Count; i++)
             {
-                decimal result = rpn.GetResult(input_lines[i], new System.Collections.Generic.Dictionary<string, string>());
+                decimal result = rpn.GetResult(input_data.inputLines[i], new System.Collections.Generic.Dictionary<string, string>());
             }
 
             end_time = DateTime.Now;
 
             TimeSpan delta = end_time - start_time;
-            Console.WriteLine($"Время расчета: {delta}");            
+            Console.WriteLine($"[Поток: {input_data.threadNumber}] Время расчета: {delta}");            
         }
 
         static void PrintSkillsData(Student s)
@@ -244,5 +213,11 @@ namespace CompSys
 
             stud = null;
         }
+    }
+
+    public class inputData
+    {
+        public List<string> inputLines = new List<string>();
+        public int threadNumber = 0;
     }
 }
